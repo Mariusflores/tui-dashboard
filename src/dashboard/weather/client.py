@@ -13,6 +13,12 @@ def fetch_data():
     temp = now["data"]["instant"]["details"]["air_temperature"]
     symbol = now["data"]["next_1_hours"]["summary"]["symbol_code"]
 
-    response = [f"{symbol} {get_weather_icon(symbol)}", f"{temp}°C"] 
-    return response
+    
+    return format_response(symbol=symbol, weather_icon=get_weather_icon(symbol), temp=temp)
+
+def format_response(symbol, weather_icon, temp):
+
+    capitalized_symbol = symbol[0].upper() + symbol[1:]
+    
+    return [f"{capitalized_symbol} {get_weather_icon(symbol)}", f"{temp}°C"] 
 
