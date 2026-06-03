@@ -45,7 +45,7 @@ class WeatherPanel(VerticalGroup):
             self.query_one("#symbol", Static).update(symbol)
             self.query_one("#temp", Static).update(temp)
         except HTTPError:
-            self.query_one("#symbol", Static).update(f"Something went wrong: ⚠️")
+            self.query_one("#symbol", Static).update("Something went wrong: ⚠️")
             self.query_one("#temp", Static).update("")
 
 
