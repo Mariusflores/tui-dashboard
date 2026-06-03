@@ -7,7 +7,7 @@ from dashboard.weather.client import fetch_data
 
 from textual.app import App, ComposeResult
 from textual.containers import VerticalGroup, HorizontalScroll, VerticalScroll, HorizontalGroup
-from textual.widgets import Digits, Header, Static
+from textual.widgets import Digits, Header, Static, Footer
 
 class Clock(VerticalGroup):
 
@@ -28,6 +28,7 @@ class WeatherPanel(VerticalGroup):
         yield Static("", id="symbol")
         yield Static("", id="temp")
 
+
     def on_mount(self) -> None:
         self.fetch_data()
 
@@ -43,8 +44,11 @@ class Dashboard(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
+        yield Footer()
         yield HorizontalScroll(Clock(), WeatherPanel())
-
+    
+    def on_mount(self) -> None:
+        self.theme = "atom-one-dark"
 
 def main():
     app = Dashboard()
