@@ -1,15 +1,18 @@
 """
-An App to show the current time.
+A Dashboard TUI Tool
 """
 
 from datetime import datetime
-from dashboard.weather.client import fetch_data
+from httpx import HTTPError
+from dashboard.weather.client import get_current_weather
 
+from textual import work
 from textual.app import App, ComposeResult
-from textual.containers import VerticalGroup, HorizontalScroll, VerticalScroll, HorizontalGroup
+from textual.containers import VerticalGroup, Horizontal
 from textual.widgets import Digits, Header, Static, Footer
 
 class Clock(VerticalGroup):
+    """ Clock Widget """
 
     def compose(self) -> ComposeResult:
         yield Digits("")
@@ -24,28 +27,43 @@ class Clock(VerticalGroup):
 
 
 class WeatherPanel(VerticalGroup):
+    """ Weather Widget """
+
     def compose(self) -> ComposeResult:
         yield Static("", id="symbol")
         yield Static("", id="temp")
 
 
     def on_mount(self) -> None:
-        self.fetch_data()
+        self.load_weather()
+        self.set_interval(600, self.load_weather)
 
-    def fetch_data(self) -> None:
-        data = fetch_data()
-        self.query_one("#symbol", Static).update(data[0])
-        self.query_one("#temp", Static).update(data[1])
+    @work(exclusive=True)
+    async def load_weather(self) -> None:
+        try:
+            symbol, temp = await get_current_weather()
+            self.query_one("#symbol", Static).update(symbol)
+            self.query_one("#temp", Static).update(temp)
+        except HTTPError:
+            self.query_one("#symbol", Static).update(f"Something went wrong: ⚠️")
+            self.query_one("#temp", Static).update("")
 
-    
 
 class Dashboard(App):
     CSS_PATH = "style/dashboard.tcss"
 
+    BINDINGS = [
+        ("q", "quit", "Quit"),
+        ("r", "refresh_weather", "Refresh weather"),
+    ]
+
+    def action_refresh_weather(self) -> None:
+        self.query_one(WeatherPanel).load_weather()
+
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        yield HorizontalScroll(Clock(), WeatherPanel())
+        yield Horizontal(Clock(), WeatherPanel())
     
     def on_mount(self) -> None:
         self.theme = "atom-one-dark"

@@ -8,7 +8,8 @@ Clock, WeatherPanel {
     width: 1fr;
     height: 100%;
     align: center middle;
-    border: solid white;
+    border: round white;
+    padding: 1 2;
 }
 
 Digits {
