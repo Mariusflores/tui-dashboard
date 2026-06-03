@@ -5,46 +5,37 @@ A Dashboard TUI Tool
 from datetime import datetime
 from httpx import HTTPError
 from dashboard.weather.client import get_current_weather
+from dashboard.themes.themes import norwegian_forest 
 
 from textual import work
-from textual.theme import Theme
 from textual.app import App, ComposeResult
 from textual.containers import VerticalGroup, Horizontal
 from textual.widgets import Digits, Header, Static, Footer
 
-norwegian_forest = Theme(
-    name="norwegian-forest",
-    primary="#6B8E5A",
-    secondary="#4A7C59",
-    accent="#C9A961",
-    foreground="#D7CFA8",
-    background="#0F1611",
-    success="#7FB069",
-    warning="#D4A574",
-    error="#B8634E",
-    surface="#16201A",
-    panel="#1B2620",
-    dark=True,
-    variables={
-        "boost": "#243029",
-        "foreground-muted": "#8B9080",
-        "border": "#3A4A3F",
-    },
-)
 
 class Clock(VerticalGroup):
     """ Clock Widget """
 
     def compose(self) -> ComposeResult:
-        yield Digits("")
+        yield Static("", id="date")
+        yield Digits("", id="time")
     
     def on_mount(self) -> None:   
         self.update_clock()
+        self.update_date()
         self.set_interval(1, self.update_clock)
+        self.set_interval(60, self.update_date)
+        
+
 
     def update_clock(self) -> None:
         clock = datetime.now().time()
         self.query_one(Digits).update(f"{clock:%T}")
+
+    def update_date(self):
+        now = datetime.now()
+        formatted = now.strftime("%A, %B %d, %Y")
+        self.query_one(Static).update(formatted)
 
 
 class WeatherPanel(VerticalGroup):
