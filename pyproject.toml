@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.scripts]
-dashboard = "dashboard.main:main"
+dashboard = "dashboard.dashboard:main"
 
 [build-system]
 requires = ["hatchling"]
