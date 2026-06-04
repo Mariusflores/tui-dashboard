@@ -4,18 +4,30 @@ Horizontal {
     height: 100%;
 }
 
-Clock, WeatherPanel {
-    width: 1fr;
-    height: 100%;
-    align: center middle;
-    border: round white;
-    padding: 1 2;
-}
-
 Digits {
     width: auto;
 }
 
 Static{
     width: auto;
+}
+
+Clock, WeatherPanel {
+    width: 1fr;
+    height: 100%;
+    align: center middle;
+    border: round $primary;
+    padding: 1 2;
+}
+
+#status-row {
+    height: 8;
+    width: 100%;
+}
+
+#calendar-panel {
+    height: 1fr;      /* fills remaining vertical space */
+    width: 100%;
+    border: round $primary;
+    padding: 1 2;
 }

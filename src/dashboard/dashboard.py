@@ -5,11 +5,12 @@ A Dashboard TUI Tool
 from datetime import datetime
 from httpx import HTTPError
 from dashboard.weather.client import get_current_weather
+from dashboard.calendar.client import get_upcoming_events
 from dashboard.themes.themes import norwegian_forest 
 
 from textual import work
 from textual.app import App, ComposeResult
-from textual.containers import VerticalGroup, Horizontal
+from textual.containers import VerticalGroup, Horizontal, Vertical
 from textual.widgets import Digits, Header, Static, Footer
 
 
@@ -60,6 +61,20 @@ class WeatherPanel(VerticalGroup):
             self.query_one("#symbol", Static).update("Something went wrong: ⚠️")
             self.query_one("#temp", Static).update("")
 
+class CalendarPanel(VerticalGroup):
+    
+    def compose(self) -> ComposeResult:
+        yield Static("", id="events")
+
+    def on_mount(self) -> None:
+        self.load_calendar()
+
+    def load_calendar(self) -> None:
+        events = get_upcoming_events()
+        lines = [f"{e.start:%a %H:%M}  {e.summary}" for e in events]
+        text = "\n".join(lines)
+        self.query_one("#events", Static).update(text)
+
 
 class Dashboard(App):
     CSS_PATH = "style/dashboard.tcss"
@@ -75,7 +90,10 @@ class Dashboard(App):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        yield Horizontal(Clock(), WeatherPanel())
+        yield Vertical(
+            Horizontal(Clock(), WeatherPanel(), id="status-row"),
+            CalendarPanel(id="calendar-panel"),
+        )
     
     def on_mount(self) -> None:
         self.register_theme(norwegian_forest)
