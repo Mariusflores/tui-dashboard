@@ -6,3 +6,4 @@ class Event:
     summary: str
     start: datetime
     end: datetime
+    all_day: bool = False
