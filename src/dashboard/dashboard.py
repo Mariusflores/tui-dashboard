@@ -81,13 +81,23 @@ class CalendarPanel(VerticalGroup):
 class Dashboard(App):
     CSS_PATH = "style/dashboard.tcss"
 
+    THEMES = ["tokyo-night", "norwegian-forest", "nord"]
+
     BINDINGS = [
         ("q", "quit", "Quit"),
         ("r", "refresh_weather", "Refresh weather"),
+        ("c", "cycle_theme", "Cycle Themes")
     ]
 
     def action_refresh_weather(self) -> None:
         self.query_one(WeatherPanel).load_weather()
+
+    
+    def action_cycle_theme(self) -> None:
+        current_theme_index = self.THEMES.index(self.theme)
+        current_theme_index = (current_theme_index + 1) % len(self.THEMES)
+        self.theme = self.THEMES[current_theme_index]
+
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -99,7 +109,7 @@ class Dashboard(App):
     
     def on_mount(self) -> None:
         self.register_theme(norwegian_forest)
-        self.theme = "norwegian-forest"
+        self.theme = self.THEMES[0]
 
 def main():
     app = Dashboard()
