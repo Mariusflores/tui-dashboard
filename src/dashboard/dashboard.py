@@ -6,7 +6,7 @@ from datetime import datetime
 from httpx import HTTPError
 from dashboard.weather.client import get_current_weather
 from dashboard.calendar.client import get_upcoming_events
-from dashboard.themes.themes import norwegian_forest 
+from dashboard.themes.themes import ALL_THEMES
 
 from textual import work
 from textual.app import App, ComposeResult
@@ -81,7 +81,7 @@ class CalendarPanel(VerticalGroup):
 class Dashboard(App):
     CSS_PATH = "style/dashboard.tcss"
 
-    THEMES = ["tokyo-night", "norwegian-forest", "nord"]
+    THEMES = [t.name for t in ALL_THEMES] + ["nord"]
 
     BINDINGS = [
         ("q", "quit", "Quit"),
@@ -108,7 +108,8 @@ class Dashboard(App):
         )
     
     def on_mount(self) -> None:
-        self.register_theme(norwegian_forest)
+        for t in ALL_THEMES:
+            self.register_theme(t)
         self.theme = self.THEMES[0]
 
 def main():
