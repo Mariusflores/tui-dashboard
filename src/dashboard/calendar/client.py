@@ -5,16 +5,12 @@ from icalendar import Calendar
 import recurring_ical_events
 from datetime import date, timedelta, datetime, time, timezone
 from dashboard.calendar.models import Event
+from dashboard.config import CONFIG
 
 
 async def get_upcoming_events():
-    PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
-    CONFIG_PATH = PROJECT_ROOT / "config.toml"
-    with CONFIG_PATH.open("rb") as f:
-        config = tomllib.load(f)
-
-    google_url = config["calendars"]["google"]
+    google_url = CONFIG["calendars"]["google"]
 
     async with httpx.AsyncClient() as client:
         response = await client.get(google_url)

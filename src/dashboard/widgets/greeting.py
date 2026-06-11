@@ -4,6 +4,7 @@ import tomllib
 from textual.app import ComposeResult
 from textual.containers import VerticalGroup
 from textual.widgets import Static
+from dashboard.config import CONFIG
 
 
 from datetime import datetime
@@ -21,13 +22,9 @@ class Greeting(VerticalGroup):
 
 
     def update_greeting(self):
-        PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
-        CONFIG_PATH = PROJECT_ROOT / "config.toml"
-        with CONFIG_PATH.open("rb") as f:
-            config = tomllib.load(f)
 
-        name = config["name"]
+        name = CONFIG["name"]
         greeting = ""
 
         hour = datetime.now().hour
