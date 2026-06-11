@@ -12,7 +12,19 @@ Static{
     width: auto;
 }
 
-Clock, WeatherPanel {
+Greeting {
+    height: 4;
+    width: 100%;
+    align: center middle;
+    content-align: center middle;
+    padding: 1 2;
+    color: $accent;
+    text-style: bold;
+    border-bottom: hkey $primary;
+}
+
+
+Clock, WeatherPanel{
     width: 1fr;
     height: 100%;
     align: center middle;

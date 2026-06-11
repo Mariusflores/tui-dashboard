@@ -9,6 +9,7 @@ from textual.containers import Horizontal, Vertical
 from textual.widgets import Header, Footer
 
 from dashboard.widgets.calendar import CalendarPanel
+from dashboard.widgets.greeting import Greeting
 from dashboard.widgets.clock import Clock
 from dashboard.widgets.weather import WeatherPanel
 
@@ -38,6 +39,7 @@ class Dashboard(App):
         yield Header()
         yield Footer()
         yield Vertical(
+            Greeting(),
             Horizontal(Clock(), WeatherPanel(), id="status-row"),
             CalendarPanel(id="calendar-panel"),
         )
