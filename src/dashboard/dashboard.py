@@ -42,7 +42,7 @@ class Dashboard(App):
         return Vertical(
             Greeting(self.config.name),
             Horizontal(
-                Clock(), WeatherPanel(self.config.weather), SystemInfoPanel(), id="status-row"
+                WeatherPanel(self.config.weather), Clock(), SystemInfoPanel(), id="status-row"
             ),
             CalendarPanel(self.config.calendar, id="calendar-panel"),
         )
