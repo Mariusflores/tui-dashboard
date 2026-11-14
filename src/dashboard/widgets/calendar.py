@@ -1,40 +1,36 @@
-from textual import work
 from textual.app import ComposeResult
-from textual.containers import VerticalGroup
 from textual.markup import escape
 from textual.widgets import Static
 
 from dashboard.calendar.client import get_upcoming_events
 from dashboard.calendar.models import Event
 from dashboard.config import CalendarConfig
+from dashboard.widgets.base import RefreshingPanel
+
+type CalendarData = tuple[list[Event], list[str]]  # (events, per-source errors)
 
 
-class CalendarPanel(VerticalGroup):
+class CalendarPanel(RefreshingPanel[CalendarData]):
     """ Upcoming events from all enabled calendar sources """
 
     def __init__(self, config: CalendarConfig, **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(config.refresh_minutes, **kwargs)
         self.config = config
 
     def compose(self) -> ComposeResult:
         yield Static("", id="events")
 
-    def on_mount(self) -> None:
-        self.load_calendar()
-        self.set_interval(self.config.refresh_minutes * 60, self.load_calendar)
+    async def fetch(self) -> CalendarData:
+        if not self.config.enabled_sources:
+            return [], []
+        return await get_upcoming_events(self.config)
 
-    @work(exclusive=True)
-    async def load_calendar(self) -> None:
-        events_widget = self.query_one("#events", Static)
+    def show(self, data: CalendarData) -> None:
+        events, errors = data
 
         if not self.config.enabled_sources:
-            events_widget.update("No calendars configured. Add [[calendar.sources]] to config.toml.")
+            self._set_text("No calendars configured. Add [[calendar.sources]] to config.toml.")
             return
-
-        try:
-            events, errors = await get_upcoming_events(self.config)
-        except Exception as e:  # never let a refresh take down the app
-            events, errors = [], [f"{type(e).__name__}: {e}"]
 
         show_source = len(self.config.enabled_sources) > 1
         lines = [self._format_event(e, show_source) for e in events]
@@ -42,7 +38,13 @@ class CalendarPanel(VerticalGroup):
             lines = [f"No events in the next {self.config.days_ahead} days."]
         lines += [f"[$error]⚠ {escape(err)}[/]" for err in errors]
 
-        events_widget.update("\n".join(lines))
+        self._set_text("\n".join(lines))
+
+    def show_error(self, error: Exception) -> None:
+        self._set_text(f"[$error]⚠ Couldn't load calendars: {escape(str(error))}[/]")
+
+    def _set_text(self, text: str) -> None:
+        self.query_one("#events", Static).update(text)
 
     def _format_event(self, event: Event, show_source: bool) -> str:
         when = f"{event.start:%a} all day" if event.all_day else f"{event.start:{self.config.time_format}}"

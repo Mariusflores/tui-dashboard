@@ -14,6 +14,9 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from dataclasses import asdict
+
+import tomlkit
 
 from dashboard.paths import PROJECT_CONFIG_PATH, USER_CONFIG_PATH
 
@@ -22,6 +25,10 @@ CONFIG_ENV_VAR = "DASHBOARD_CONFIG"
 
 class ConfigError(Exception):
     """Raised when the config file is missing or invalid."""
+
+
+class ConfigNotFoundError(ConfigError):
+    """Raised when no config file could be found."""
 
 
 # --------------------------------------------------------------------------- #
@@ -92,7 +99,7 @@ def find_config_path(explicit: str | Path | None = None) -> Path:
             return path
 
     searched = "\n".join(f"  - {p}" for p in candidates)
-    raise ConfigError(
+    raise ConfigNotFoundError(
         "No config file found. Looked in:\n"
         f"{searched}\n"
         f"Copy config.toml.example to {USER_CONFIG_PATH} and fill it in."
@@ -108,10 +115,46 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         raise ConfigError(f"{config_path}: invalid TOML: {e}") from e
 
     try:
-        return _parse_app(raw, config_path)
+        return parse_config(raw, config_path)
     except ConfigError as e:
         raise ConfigError(f"{config_path}: {e}") from None
 
+
+def parse_config(raw: dict[str, Any], path: Path | None = None) -> AppConfig:
+    """Validate a TOML-shaped dict. Used by load_config and the setup screen."""
+    return _parse_app(raw, path)
+
+# --------------------------------------------------------------------------- #
+# Creating the config file
+# --------------------------------------------------------------------------- #
+
+def config_to_dict(config: AppConfig) -> dict[str, Any]:
+    """The reverse of parse_config. Drops None values, which TOML can't store."""
+    def clean(d: dict) -> dict:
+        return {k: v for k, v in d.items() if v is not None}
+
+    c = config.calendar
+    return {
+        "name": config.name,
+        "theme": config.theme,
+        "weather": asdict(config.weather),
+        "calendar": {
+            "days_ahead": c.days_ahead,
+            "refresh_minutes": c.refresh_minutes,
+            "time_format": c.time_format,
+            "sources": [clean(asdict(s)) for s in c.sources],
+        },
+    }
+
+def save_config(config: AppConfig, path: Path = USER_CONFIG_PATH) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    # Create the file readable only by the user: it contains calendar links.
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
+        f.write(tomlkit.dumps(config_to_dict(config)))
+    os.replace(tmp, path)  # all at once: no half-written config if the app dies
+    return path
 
 # --------------------------------------------------------------------------- #
 # Parsing / validation

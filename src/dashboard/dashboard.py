@@ -9,8 +9,10 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header
 
-from dashboard.config import AppConfig, ConfigError, load_config
+from dashboard.config import AppConfig, ConfigError, ConfigNotFoundError, load_config, save_config
+from dashboard.screens.setup import SetupScreen
 from dashboard.themes.themes import ALL_THEMES
+from dashboard.widgets.base import RefreshingPanel
 from dashboard.widgets.calendar import CalendarPanel
 from dashboard.widgets.clock import Clock
 from dashboard.widgets.greeting import Greeting
@@ -24,35 +26,47 @@ class Dashboard(App):
 
     BINDINGS = [
         ("q", "quit", "Quit"),
-        ("r", "refresh_weather", "Refresh weather"),
+        ("r", "refresh", "Refresh"),
         ("c", "cycle_theme", "Cycle Themes"),
     ]
 
-    def __init__(self, config: AppConfig) -> None:
+    def __init__(self, config: AppConfig | None) -> None:
         super().__init__()
         self.config = config
 
-    def action_refresh_weather(self) -> None:
-        self.query_one(WeatherPanel).load_weather()
+    # --- layout ------------------------------------------------------------ #
 
-    def action_cycle_theme(self) -> None:
-        # The theme may have been picked from the command palette and not be in THEMES.
-        index = self.THEMES.index(self.theme) if self.theme in self.THEMES else -1
-        self.theme = self.THEMES[(index + 1) % len(self.THEMES)]
-
-    def compose(self) -> ComposeResult:
-        yield Header()
-        yield Footer()
-        yield Vertical(
+    def _main_layout(self) -> Vertical:
+        return Vertical(
             Greeting(self.config.name),
             Horizontal(Clock(), WeatherPanel(self.config.weather), id="status-row"),
             CalendarPanel(self.config.calendar, id="calendar-panel"),
         )
 
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Footer()
+        if self.config is not None:
+            yield self._main_layout()
+
     def on_mount(self) -> None:
         for t in ALL_THEMES:
             self.register_theme(t)
 
+        if self.config is None:
+            # Show setup on top; _setup_done runs when it calls dismiss(config)
+            self.push_screen(SetupScreen(self.THEMES), callback=self._setup_done)
+        else:
+            self._apply_theme()
+
+    def _setup_done(self, config: AppConfig | None) -> None:
+        path = save_config(config)
+        self.config = config
+        self.mount(self._main_layout())  # add widgets to the now-visible main screen
+        self._apply_theme()
+        self.notify(f"Saved config to {path}")
+
+    def _apply_theme(self) -> None:
         if self.config.theme in self.available_themes:
             self.theme = self.config.theme
         else:
@@ -62,6 +76,17 @@ class Dashboard(App):
                 severity="warning",
             )
 
+    # --- actions (key bindings) ------------------------------------------- #
+
+    def action_refresh(self) -> None:
+        for panel in self.query(RefreshingPanel):
+            panel.reload()
+
+    def action_cycle_theme(self) -> None:
+        # The theme may have been picked from the command palette and not be in THEMES.
+        index = self.THEMES.index(self.theme) if self.theme in self.THEMES else -1
+        self.theme = self.THEMES[(index + 1) % len(self.THEMES)]
+
 
 def main():
     parser = argparse.ArgumentParser(prog="dashboard", description="A terminal dashboard.")
@@ -70,6 +95,8 @@ def main():
 
     try:
         config = load_config(args.config)
+    except ConfigNotFoundError:
+        config = None  # -> setup screen
     except ConfigError as e:
         print(f"Config error: {e}", file=sys.stderr)
         sys.exit(1)
