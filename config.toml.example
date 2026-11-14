@@ -1,3 +1,35 @@
+# tui-dashboard configuration
+#
+# Copy this file to ~/.config/tui-dashboard/config.toml (or config.toml in the
+# project root) and fill it in. Every setting is optional except the calendar
+# source urls. Removed settings fall back to the defaults shown here.
+#
+# Keep your real config private: an ICS link gives read access to the calendar.
+
 name = "Your Name"
-[calendars]
-google = "<calendar-ics>"
+theme = "norwegian-forest"   # norwegian-forest, graphite, hearth, nord
+
+[weather]
+lat = 59.9139                # Oslo
+lon = 10.7522
+refresh_minutes = 10
+
+[calendar]
+days_ahead = 7
+refresh_minutes = 10
+time_format = "%a %H:%M"     # strftime format for event times
+
+# Add one [[calendar.sources]] block per calendar.
+# color accepts a name ("red"), a hex value ("#7FB069") or a theme variable ("$accent").
+# webcal:// links are accepted and converted to https://.
+
+[[calendar.sources]]
+name = "Work"
+url = "https://outlook.office365.com/owa/calendar/.../calendar.ics"
+color = "$accent"
+
+[[calendar.sources]]
+name = "Personal"
+url = "https://calendar.google.com/calendar/ical/.../basic.ics"
+color = "$secondary"
+enabled 
