@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class Event:
     summary: str
     start: datetime
     end: datetime
     all_day: bool = False
+    source: str = ""
+    color: str | None = None
