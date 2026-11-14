@@ -7,7 +7,7 @@ from dashboard.widgets.base import RefreshingPanel
 
 
 class WeatherPanel(RefreshingPanel[WeatherDisplay]):
-    """ Weather Widget """
+    """Weather Widget"""
 
     def __init__(self, config: WeatherConfig, **kwargs) -> None:
         super().__init__(config.refresh_minutes, **kwargs)

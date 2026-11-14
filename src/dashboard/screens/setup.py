@@ -9,7 +9,7 @@ from dashboard.calendar.client import test_source
 from dashboard.config import AppConfig, ConfigError, WeatherConfig, parse_config
 
 
-class SetupScreen(Screen[AppConfig]):          # [AppConfig] = the type dismiss() returns
+class SetupScreen(Screen[AppConfig]):  # [AppConfig] = the type dismiss() returns
     CSS = """
     #setup { width: 70; max-width: 100%; height: auto; margin: 1 2; padding: 1 2;
              border: round $primary; }
@@ -29,15 +29,16 @@ class SetupScreen(Screen[AppConfig]):          # [AppConfig] = the type dismiss(
     def compose(self) -> ComposeResult:
         defaults = WeatherConfig()
         yield Header()
-        with VerticalScroll(id="setup"):       # `with` = children go inside this container
+        with VerticalScroll(id="setup"):  # `with` = children go inside this container
             yield Static("Welcome! Let's set up your dashboard.", id="title")
 
             yield Label("Your name")
             yield Input(placeholder="Name", id="name")
 
             yield Label("Theme")
-            yield Select([(t, t) for t in self.themes], value=self.themes[0],
-                         allow_blank=False, id="theme")
+            yield Select(
+                [(t, t) for t in self.themes], value=self.themes[0], allow_blank=False, id="theme"
+            )
 
             yield Label("Location (latitude, longitude)")
             with Horizontal(classes="row"):
@@ -59,13 +60,16 @@ class SetupScreen(Screen[AppConfig]):          # [AppConfig] = the type dismiss(
     # ---- events: Textual calls on_<widget>_<event> automatically -----------
     def on_select_changed(self, event: Select.Changed) -> None:
         if event.select.id == "theme":
-            self.app.theme = event.value       # live preview
+            self.app.theme = event.value  # live preview
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
-            case "save": self.save()
-            case "test": self.test_calendar()
-            case "quit": self.app.exit()
+            case "save":
+                self.save()
+            case "test":
+                self.test_calendar()
+            case "quit":
+                self.app.exit()
 
     # ---- form -> dict -> AppConfig (reusing config.py validation) ---------
     def _value(self, widget_id: str) -> str:
@@ -75,7 +79,7 @@ class SetupScreen(Screen[AppConfig]):          # [AppConfig] = the type dismiss(
         try:
             return float(self._value(widget_id))
         except ValueError:
-            return self._value(widget_id)      # let parse_config report it
+            return self._value(widget_id)  # let parse_config report it
 
     def _form_to_dict(self) -> dict:
         raw = {
@@ -94,7 +98,7 @@ class SetupScreen(Screen[AppConfig]):          # [AppConfig] = the type dismiss(
         except ConfigError as e:
             self.query_one("#error", Static).update(f"[$error]{escape(str(e))}[/]")
             return
-        self.dismiss(config)                   # closes the screen, hands config to the callback
+        self.dismiss(config)  # closes the screen, hands config to the callback
 
     # ---- runs in the background so the UI doesn't freeze -------------------
     @work(exclusive=True)

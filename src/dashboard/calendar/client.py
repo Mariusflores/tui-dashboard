@@ -28,7 +28,7 @@ async def get_upcoming_events(config: CalendarConfig) -> tuple[list[Event], list
 
     events: list[Event] = []
     errors: list[str] = []
-    for source, result in zip(sources, results):
+    for source, result in zip(sources, results, strict=False):
         if isinstance(result, BaseException):
             errors.append(f"{source.name}: {_describe_error(result)}")
         else:
@@ -60,13 +60,14 @@ async def _fetch_source(
         )
     return events
 
+
 async def test_source(source: CalendarSource, days_ahead: int = 7) -> int:
     """Fetch a single source and return how many events it has. Raises on failure."""
     start = date.today()
     async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-        events = await _fetch_source(client, source, start, start +
-        timedelta(days=days_ahead))
+        events = await _fetch_source(client, source, start, start + timedelta(days=days_ahead))
     return len(events)
+
 
 def _to_local(value: date | datetime) -> datetime:
     """Turn dates, naive and aware datetimes into aware local datetimes so they sort together."""

@@ -11,7 +11,7 @@ type CalendarData = tuple[list[Event], list[str]]  # (events, per-source errors)
 
 
 class CalendarPanel(RefreshingPanel[CalendarData]):
-    """ Upcoming events from all enabled calendar sources """
+    """Upcoming events from all enabled calendar sources"""
 
     def __init__(self, config: CalendarConfig, **kwargs) -> None:
         super().__init__(config.refresh_minutes, **kwargs)
@@ -47,7 +47,11 @@ class CalendarPanel(RefreshingPanel[CalendarData]):
         self.query_one("#events", Static).update(text)
 
     def _format_event(self, event: Event, show_source: bool) -> str:
-        when = f"{event.start:%a} all day" if event.all_day else f"{event.start:{self.config.time_format}}"
+        when = (
+            f"{event.start:%a} all day"
+            if event.all_day
+            else f"{event.start:{self.config.time_format}}"
+        )
         line = f"{when}  {escape(event.summary)}"
         if show_source:
             line += f"  [dim]({escape(event.source)})[/]"

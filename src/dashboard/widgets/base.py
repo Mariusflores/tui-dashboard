@@ -19,7 +19,6 @@ from textual.containers import VerticalGroup
 
 
 class RefreshingPanel[T](VerticalGroup):
-
     def __init__(self, refresh_minutes: float, **kwargs) -> None:
         super().__init__(**kwargs)
         self.refresh_minutes = refresh_minutes

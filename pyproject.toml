@@ -23,3 +23,37 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/dashboard"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes: unused imports/variables, undefined names
+    "I",        # import sorting
+    "B",        # bugbear: likely bugs
+    "UP",       # pyupgrade: modern Python syntax
+    "SIM",      # simplifications
+    "RUF",      # ruff-specific rules
+]
+ignore = [
+    "RUF012",   # Textual's BINDINGS/CSS class attributes are meant to be plain lists
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["dashboard"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+mypy_path = "src"
+strict = true

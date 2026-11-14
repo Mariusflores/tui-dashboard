@@ -1,31 +1,24 @@
-
 SYMBOLS = {
     # Clear sky
     "clearsky_day": "☀️",
     "clearsky_night": "🌙",
     "clearsky_polartwilight": "🌙",
-
     # Fair (mostly clear)
     "fair_day": "🌤️",
     "fair_night": "🌙",
     "fair_polartwilight": "🌙",
-
     # Partly cloudy
     "partlycloudy_day": "⛅",
     "partlycloudy_night": "☁️",
     "partlycloudy_polartwilight": "☁️",
-
     # Cloudy
     "cloudy": "☁️",
-
     # Fog
     "fog": "🌫️",
-
     # Rain
     "rain": "🌧️",
     "lightrain": "🌦️",
     "heavyrain": "🌧️",
-
     # Rain showers
     "rainshowers_day": "🌦️",
     "rainshowers_night": "🌧️",
@@ -36,7 +29,6 @@ SYMBOLS = {
     "heavyrainshowers_day": "🌧️",
     "heavyrainshowers_night": "🌧️",
     "heavyrainshowers_polartwilight": "🌧️",
-
     # Rain and thunder
     "rainandthunder": "⛈️",
     "lightrainandthunder": "⛈️",
@@ -50,7 +42,6 @@ SYMBOLS = {
     "heavyrainshowersandthunder_day": "⛈️",
     "heavyrainshowersandthunder_night": "⛈️",
     "heavyrainshowersandthunder_polartwilight": "⛈️",
-
     # Sleet
     "sleet": "🌨️",
     "lightsleet": "🌨️",
@@ -64,7 +55,6 @@ SYMBOLS = {
     "heavysleetshowers_day": "🌨️",
     "heavysleetshowers_night": "🌨️",
     "heavysleetshowers_polartwilight": "🌨️",
-
     # Sleet and thunder
     "sleetandthunder": "⛈️",
     "lightsleetandthunder": "⛈️",
@@ -78,7 +68,6 @@ SYMBOLS = {
     "heavysleetshowersandthunder_day": "⛈️",
     "heavysleetshowersandthunder_night": "⛈️",
     "heavysleetshowersandthunder_polartwilight": "⛈️",
-
     # Snow
     "snow": "❄️",
     "lightsnow": "🌨️",
@@ -92,7 +81,6 @@ SYMBOLS = {
     "heavysnowshowers_day": "❄️",
     "heavysnowshowers_night": "❄️",
     "heavysnowshowers_polartwilight": "❄️",
-
     # Snow and thunder
     "snowandthunder": "⛈️",
     "lightsnowandthunder": "⛈️",

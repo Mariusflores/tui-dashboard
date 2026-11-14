@@ -1,13 +1,12 @@
+from datetime import datetime
+
 from textual.app import ComposeResult
 from textual.containers import VerticalGroup
 from textual.widgets import Digits, Static
 
 
-from datetime import datetime
-
-
 class Clock(VerticalGroup):
-    """ Clock Widget """
+    """Clock Widget"""
 
     def compose(self) -> ComposeResult:
         yield Static("", id="date")
@@ -18,8 +17,6 @@ class Clock(VerticalGroup):
         self.update_date()
         self.set_interval(1, self.update_clock)
         self.set_interval(60, self.update_date)
-
-
 
     def update_clock(self) -> None:
         clock = datetime.now().time()

@@ -11,10 +11,9 @@ from __future__ import annotations
 
 import os
 import tomllib
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
-from dataclasses import asdict
 
 import tomlkit
 
@@ -34,6 +33,7 @@ class ConfigNotFoundError(ConfigError):
 # --------------------------------------------------------------------------- #
 # Config sections
 # --------------------------------------------------------------------------- #
+
 
 @dataclass(frozen=True)
 class CalendarSource:
@@ -74,6 +74,7 @@ class AppConfig:
 # --------------------------------------------------------------------------- #
 # Locating the file
 # --------------------------------------------------------------------------- #
+
 
 def find_config_path(explicit: str | Path | None = None) -> Path:
     """
@@ -124,12 +125,15 @@ def parse_config(raw: dict[str, Any], path: Path | None = None) -> AppConfig:
     """Validate a TOML-shaped dict. Used by load_config and the setup screen."""
     return _parse_app(raw, path)
 
+
 # --------------------------------------------------------------------------- #
 # Creating the config file
 # --------------------------------------------------------------------------- #
 
+
 def config_to_dict(config: AppConfig) -> dict[str, Any]:
     """The reverse of parse_config. Drops None values, which TOML can't store."""
+
     def clean(d: dict) -> dict:
         return {k: v for k, v in d.items() if v is not None}
 
@@ -146,6 +150,7 @@ def config_to_dict(config: AppConfig) -> dict[str, Any]:
         },
     }
 
+
 def save_config(config: AppConfig, path: Path = USER_CONFIG_PATH) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
@@ -156,9 +161,11 @@ def save_config(config: AppConfig, path: Path = USER_CONFIG_PATH) -> Path:
     os.replace(tmp, path)  # all at once: no half-written config if the app dies
     return path
 
+
 # --------------------------------------------------------------------------- #
 # Parsing / validation
 # --------------------------------------------------------------------------- #
+
 
 def _parse_app(raw: dict[str, Any], path: Path) -> AppConfig:
     if "calendars" in raw:
@@ -250,7 +257,9 @@ def _normalize_url(url: str, where: str) -> str:
 _MISSING = object()
 
 
-def _get(table: dict, key: str, typ: type, default: Any, where: str, *, required: bool = False) -> Any:
+def _get(
+    table: dict, key: str, typ: type, default: Any, where: str, *, required: bool = False
+) -> Any:
     value = table.get(key, _MISSING)
     if value is _MISSING:
         if required:
@@ -289,6 +298,10 @@ def _require_positive(value: float, key: str, where: str) -> None:
 
 def _type_name(typ: type) -> str:
     return {
-        str: "a string", int: "an integer", float: "a number", bool: "true/false",
-        dict: "a table", list: "a list",
+        str: "a string",
+        int: "an integer",
+        float: "a number",
+        bool: "true/false",
+        dict: "a table",
+        list: "a list",
     }.get(typ, typ.__name__)

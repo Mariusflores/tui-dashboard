@@ -6,7 +6,7 @@ from textual.widgets import Static
 
 
 class Greeting(VerticalGroup):
-    """ Greeting Widget """
+    """Greeting Widget"""
 
     def __init__(self, name: str, **kwargs) -> None:
         super().__init__(**kwargs)
