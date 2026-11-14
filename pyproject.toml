@@ -28,6 +28,7 @@ packages = ["src/dashboard"]
 dev = [
     "mypy>=2.4.1",
     "ruff>=0.17.5",
+    "types-psutil>=7.2.2.20261111",
 ]
 
 [tool.ruff]

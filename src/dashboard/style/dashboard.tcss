@@ -24,7 +24,7 @@ Greeting {
 }
 
 
-Clock, WeatherPanel{
+Clock, WeatherPanel, SystemInfoPanel {
     width: 1fr;
     height: 100%;
     align: center middle;

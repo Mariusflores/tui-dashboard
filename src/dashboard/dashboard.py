@@ -17,6 +17,7 @@ from dashboard.widgets.base import RefreshingPanel
 from dashboard.widgets.calendar import CalendarPanel
 from dashboard.widgets.clock import Clock
 from dashboard.widgets.greeting import Greeting
+from dashboard.widgets.sysinfo import SystemInfoPanel
 from dashboard.widgets.weather import WeatherPanel
 
 
@@ -40,7 +41,9 @@ class Dashboard(App):
     def _main_layout(self) -> Vertical:
         return Vertical(
             Greeting(self.config.name),
-            Horizontal(Clock(), WeatherPanel(self.config.weather), id="status-row"),
+            Horizontal(
+                Clock(), WeatherPanel(self.config.weather), SystemInfoPanel(), id="status-row"
+            ),
             CalendarPanel(self.config.calendar, id="calendar-panel"),
         )
 
