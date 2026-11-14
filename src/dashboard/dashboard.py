@@ -9,6 +9,8 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header
 
+from dataclasses import replace
+
 from dashboard.config import AppConfig, ConfigError, ConfigNotFoundError, load_config, save_config
 from dashboard.screens.setup import SetupScreen
 from dashboard.themes.themes import ALL_THEMES
@@ -82,11 +84,19 @@ class Dashboard(App):
         for panel in self.query(RefreshingPanel):
             panel.reload()
 
+
     def action_cycle_theme(self) -> None:
         # The theme may have been picked from the command palette and not be in THEMES.
         index = self.THEMES.index(self.theme) if self.theme in self.THEMES else -1
         self.theme = self.THEMES[(index + 1) % len(self.THEMES)]
+        self._save_theme()
 
+
+    def _save_theme(self) -> None:
+        if self.config is None:
+            return
+        self.config = replace(self.config, theme=self.theme)
+        save_config(self.config, self.config.path)
 
 def main():
     parser = argparse.ArgumentParser(prog="dashboard", description="A terminal dashboard.")
